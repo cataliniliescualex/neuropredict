@@ -1,7 +1,9 @@
-from flask import request, render_template
+from flask import Flask, request, render_template
 import requests
 import json
 import numpy as np
+
+app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def predict_digit():
@@ -26,3 +28,6 @@ def predict_digit():
 @app.route('/')
 def home():
     return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
