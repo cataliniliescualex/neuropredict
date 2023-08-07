@@ -30,4 +30,6 @@ def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    from gevent.pywsgi import WSGIServer
+    http_server = WSGIServer(('', 8000), app)
+    http_server.serve_forever()
