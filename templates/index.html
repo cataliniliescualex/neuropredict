@@ -8,10 +8,54 @@
 Your browser does not support the HTML5 canvas tag.
 </canvas>
 
+<button onclick="submitForm()">Submit</button>
+
 <p>Prediction: {{ prediction }}</p>
 
 <script>
-// Add JavaScript code here to allow drawing on the canvas
+// JavaScript code to handle drawing on the canvas
+var canvas = document.getElementById('digitCanvas');
+var ctx = canvas.getContext('2d');
+var drawing = false;
+
+canvas.addEventListener('mousedown', function(e) {
+    drawing = true;
+    draw(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, false);
+});
+
+canvas.addEventListener('mousemove', function(e) {
+    draw(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, drawing);
+});
+
+canvas.addEventListener('mouseup', function() {
+    drawing = false;
+});
+
+function draw(x, y, isDrawing) {
+    if (!isDrawing) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    } else {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+}
+
+function submitForm() {
+    // Convert the drawn image to base64
+    var dataUrl = canvas.toDataURL();
+    
+    // Create a form and append the base64 image data
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.appendChild(document.createElement('input'));
+    form.children[0].name = 'canvasData';
+    form.children[0].value = dataUrl;
+    
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
+}
 </script>
 
 </body>
