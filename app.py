@@ -1,20 +1,16 @@
-from flask import Flask, request, jsonify
-app = Flask(__name__)
+
+def preprocess_canvas_data(canvas_data):
+    # Placeholder function to preprocess canvas data
+    # This should be replaced with actual preprocessing steps
+    return np.zeros((1, 784))
+
+
 from flask import request, render_template
 import requests
 import json
 import numpy as np
 
 @app.route('/', methods=['POST'])
-
-def preprocess_canvas_data(canvas_data):
-    # Assuming canvas_data is a list of lists (28x28 pixels)
-    # Flatten and reshape the data
-    flattened_data = np.array(canvas_data).flatten().reshape(1, 784)
-    # Normalize to [0, 1] range
-    normalized_data = flattened_data / 255.0
-    return normalized_data.tolist()
-
 def predict_digit():
     # Get canvas data from form
     canvas_data = request.form['canvasData']
