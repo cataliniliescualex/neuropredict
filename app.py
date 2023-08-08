@@ -5,8 +5,6 @@ import numpy as np
 
 @app.route('/', methods=['POST'])
 
-import numpy as np
-
 def preprocess_canvas_data(canvas_data):
     # Assuming canvas_data is a list of lists (28x28 pixels)
     # Flatten and reshape the data
