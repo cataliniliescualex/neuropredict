@@ -1,10 +1,5 @@
-
-def preprocess_canvas_data(canvas_data):
-    # Placeholder function to preprocess canvas data
-    # This should be replaced with actual preprocessing steps
-    return np.zeros((1, 784))
-
-
+from flask import Flask, request, render_template
+app = Flask(__name__)
 from flask import request, render_template
 import requests
 import json
