@@ -1,11 +1,20 @@
-from flask import Flask, request, render_template
+from flask import request, render_template
 import requests
 import json
 import numpy as np
 
-app = Flask(__name__)
-
 @app.route('/', methods=['POST'])
+
+import numpy as np
+
+def preprocess_canvas_data(canvas_data):
+    # Assuming canvas_data is a list of lists (28x28 pixels)
+    # Flatten and reshape the data
+    flattened_data = np.array(canvas_data).flatten().reshape(1, 784)
+    # Normalize to [0, 1] range
+    normalized_data = flattened_data / 255.0
+    return normalized_data.tolist()
+
 def predict_digit():
     # Get canvas data from form
     canvas_data = request.form['canvasData']
@@ -29,7 +38,3 @@ def predict_digit():
 def home():
     return render_template('index.html')
 
-if __name__ == '__main__':
-    from gevent.pywsgi import WSGIServer
-    http_server = WSGIServer(('', 8000), app)
-    http_server.serve_forever()
