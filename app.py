@@ -1,46 +1,37 @@
-
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect, url_for
 import numpy as np
-from tensorflow.keras.models import load_model
-import re
 import base64
 import io
+from PIL import Image
+import requests
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Load the model
-model = load_model("mnist_model.h5")
-
-def preprocess_canvas_data(data):
-    # Process the canvas data URL to obtain the image data
-    data = re.sub('^data:image/.+;base64,', '', data)
-    data = base64.b64decode(data)
-    data = io.BytesIO(data)
-    im = Image.open(data).convert("L")
-    im = im.resize((28, 28))
-    im = np.array(im)
-    im = im.reshape(1, 28, 28, 1)
-    im = im/255.0
-    return im
+AZURE_ENDPOINT = "http://8dfcb175-f4d9-46f8-baa7-ab9a6431dcfc.eastus.azurecontainer.io/score"
 
 @app.route('/', methods=['GET', 'POST'])
-def predict_digit():
+def index():
+    prediction = ""
     if request.method == 'POST':
-        # Get canvas data from the POST request
-        canvas_data = request.form['canvas_data']
+        # Get the base64 representation of the drawn image
+        canvas_data = request.form.get('canvasData').split(",")[1]
+        decoded_img = base64.b64decode(canvas_data)
         
-        # Preprocess the canvas data
-        data = preprocess_canvas_data(canvas_data)
-        
-        # Make prediction
-        prediction = model.predict(data)
-        predicted_class = np.argmax(prediction)
-        
-        # Return the prediction
-        return jsonify({'predicted_class': int(predicted_class)})
-    
-    return render_template('index.html')
+        # Convert it to an image and preprocess for the model
+        img = Image.open(io.BytesIO(decoded_img)).convert('L')
+        img = img.resize((28, 28))  # Resize image to model's expected input size
+        img_array = np.array(img)
+        img_array = img_array.reshape(1, 28, 28).tolist()
 
-if __name__ == '__main__':
+        # Send the image data to Azure endpoint for inference
+        headers = {
+            "Content-Type": "application/json"
+        }
+        response = requests.post(AZURE_ENDPOINT, json={"data": img_array}, headers=headers)
+        if response.status_code == 200:
+            prediction = response.json()[0]
+
+    return render_template('index.html', prediction=prediction)
+
+if __name__ == "__main__":
     app.run(debug=True)
